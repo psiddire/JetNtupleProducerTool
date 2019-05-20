@@ -87,7 +87,7 @@ In this version, the reconstructed jets are AK4 jets clustered from Particle Flo
 | PF_mass[nPF] | Float_t | Mass of a PF candidate |
 | PF_id[nPF] | Int_t | Generator level particle identifier for the particle flow candidates, as defined in the PDG particle numbering scheme |
 | PF_fromPV[nPF] | UInt_t | A number indicating how tightly a particle is associated with the primary vertex (ranges from 3 to 0) |
-| PF_fromAK4Jet | UInt_t | 1: if the particle flow candidate is a constituent of the reconstructed AK4 jet; 0: if it is not a constituent of the jet |
+| PF_fromAK4Jet[nPF] | UInt_t | 1: if the particle flow candidate is a constituent of the reconstructed AK4 jet; 0: if it is not a constituent of the jet |
 | genJetPt | Float_t | Transverse momentum of the matched generator level jet |
 | genJetEta | Float_t | Pseudorapidity (η) of the matched generator level jet |
 | genJetPhi | Float_t | Azimuthal angle (ϕ) of the matched generator level jet |
