@@ -7,11 +7,13 @@
 #include <cmath>
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
+#include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/Common/interface/ValueMap.h"
@@ -19,6 +21,8 @@
 // File service for saving the ROOT files
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
+#include "JetMETCorrections/Modules/interface/JetResolution.h"
+#include "FWCore/Framework/interface/ESHandle.h"
 
 // MiniAOD PAT libraries
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
@@ -71,6 +75,7 @@ class JetAnalyzer : public edm::EDAnalyzer {
         edm::EDGetTokenT<edm::ValueMap<int> > multToken_;
 
         // Configurable vertex parameters
+	string m_payload;
         double goodVtxNdof;
         double goodVtxZ;
         double goodVtxRho;
@@ -97,6 +102,8 @@ class JetAnalyzer : public edm::EDAnalyzer {
 
         Float_t jetRawPt;
         Float_t jetRawMass;
+
+        Float_t jetSF;
 
         UInt_t jetLooseID;
         UInt_t jetTightID;

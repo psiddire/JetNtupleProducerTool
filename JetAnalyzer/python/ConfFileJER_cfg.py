@@ -12,7 +12,7 @@ process.QGTagger.jetsLabel = cms.string("QGL_AK4PFchs")
 
 # File service
 process.load("CommonTools.UtilAlgos.TFileService_cfi")
-process.TFileService.fileName=cms.string("JetNtuple_RunIISummer16_13TeV_MC.root")
+process.TFileService.fileName=cms.string("JetNtuple_RunIISummer16_13TeV_MCJER.root")
 
 process.source = cms.Source("PoolSource", 
                             fileNames = cms.untracked.vstring("/store/mc/RunIIAutumn18MiniAOD/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/270000/0C645070-A197-2648-B6E3-9AA2D7545A4F.root"),
@@ -31,7 +31,6 @@ process.jec = cms.ESSource("PoolDBESSource",
     )
 process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 
-
 ### JECs =====================================================================================================
 from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import updatedPatJetCorrFactors
 process.patJetCorrFactorsReapplyJEC = updatedPatJetCorrFactors.clone(
@@ -47,6 +46,33 @@ process.patJetsReapplyJEC = updatedPatJets.clone(
     jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactorsReapplyJEC"))
     )
 
+### JER
+process.load('Configuration.StandardSequences.Services_cff')
+process.load("JetMETCorrections.Modules.JetResolutionESProducer_cfi")
+from CondCore.DBCommon.CondDBSetup_cfi import *
+
+process.jer = cms.ESSource("PoolDBESSource",
+        CondDBSetup,
+        toGet = cms.VPSet(
+            # Resolution
+            cms.PSet(
+                record = cms.string('JetResolutionRcd'),
+                tag    = cms.string('JR_Autumn18_V7b_MC_PtResolution_AK4PFchs'),
+                label  = cms.untracked.string('AK4PFchs_pt')
+                ),
+            # Scale factors
+            cms.PSet(
+                record = cms.string('JetResolutionScaleFactorRcd'),
+                tag    = cms.string('JR_Autumn18_V7b_MC_SF_AK4PFchs'),
+                label  = cms.untracked.string('AK4PFchs')
+                ),
+            ),
+        connect = cms.string('sqlite:Autumn18_V7b_MC.db')
+        )
+
+process.es_prefer_jer = cms.ESPrefer('PoolDBESSource', 'jer')
+
+
 process.AK4jets = cms.EDAnalyzer("JetAnalyzer",
 	## jet, PF and generator level collections ##
         jets = cms.InputTag("patJetsReapplyJEC"),
@@ -55,6 +81,7 @@ process.AK4jets = cms.EDAnalyzer("JetAnalyzer",
 	genEventInfo = cms.InputTag("generator"),
 	## good primary vertices ##
 	vertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
+        payload = cms.string('AK4PFchs'),
 	confGoodVtxNdof = cms.double(4),
 	confGoodVtxZ = cms.double(24),
 	confGoodVtxRho = cms.double(2),

@@ -7,3 +7,14 @@
 <flags EDM_PLUGIN="1"/>
 <use name="DataFormats/VertexReco"/>
 <use name="DataFormats/PatCandidates"/>
+<use name="CondCore/PluginSystem"/>
+<use name="CondFormats/DataRecord"/>
+<use name="CondFormats/JetMETObjects"/>
+<use name="CondCore/DBCommon"/>
+<use name="CondCore/DBOutputService"/>
+<use name="DataFormats/JetReco"/>
+<use name="DataFormats/METReco"/>
+<use name="FWCore/Utilities"/>
+<use name="JetMETCorrections/Algorithms"/>
+<use name="JetMETCorrections/Objects"/>
+<use name="JetMETCorrections/Modules"/>

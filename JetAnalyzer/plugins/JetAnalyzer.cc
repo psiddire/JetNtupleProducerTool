@@ -23,6 +23,7 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig):
     axis2Token_(consumes<edm::ValueMap<float>>(edm::InputTag("QGTagger", "axis2"))),
     multToken_(consumes<edm::ValueMap<int>>(edm::InputTag("QGTagger", "mult")))
 {
+    m_payload = iConfig.getParameter<std::string>("payload");
     goodVtxNdof = iConfig.getParameter<double>("confGoodVtxNdof");
     goodVtxZ = iConfig.getParameter<double>("confGoodVtxZ");
     goodVtxRho = iConfig.getParameter<double>("confGoodVtxRho");
@@ -45,6 +46,7 @@ void JetAnalyzer::beginJob()
 
     jetTree->Branch("jetRawPt", &jetRawPt, "jetRawPt/F");
     jetTree->Branch("jetRawMass", &jetRawMass, "jetRawMass/F");
+    jetTree->Branch("jetSF", &jetSF, "jetSF/F");
 
     jetTree->Branch("jetLooseID", &jetLooseID, "jetLooseID/I");
     jetTree->Branch("jetTightID", &jetTightID, "jetTightID/I");
@@ -126,6 +128,7 @@ void JetAnalyzer::beginJob()
     jetTree->GetBranch("jetArea")->SetTitle("Catchment area of the jet; used for jet energy corrections");
     jetTree->GetBranch("jetRawPt")->SetTitle("Transverse momentum of the jet before energy corrections");
     jetTree->GetBranch("jetRawMass")->SetTitle("Mass of the jet before energy corrections");
+    jetTree->GetBranch("jetSF")->SetTitle("JER SF");
     jetTree->GetBranch("jetLooseID")->SetTitle("Indicates if the jet passes loose selection criteria; used for dismissing fake jets");
     jetTree->GetBranch("jetTightID")->SetTitle("Indicates if the jet passes tight selection criteria; used for dismissing fake jets");
     jetTree->GetBranch("jetGenMatch")->SetTitle("1: if a matched generator level jet exists; 0: if no match was found");
@@ -217,6 +220,8 @@ void JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     iEvent.getByToken(axis2Token_, axis2Handle);
     edm::Handle<edm::ValueMap<int>> multHandle;
     iEvent.getByToken(multToken_, multHandle);
+
+    JME::JetResolutionScaleFactor resolution = JME::JetResolutionScaleFactor::get(iSetup, m_payload);
 
     // Create vectors for the jets
     // sortedJets include all jets of the event, while selectedJets have pT and eta cuts
@@ -378,6 +383,9 @@ void JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         rhoCentral = *pfRhoCentralHandle;
         rhoCentralNeutral = *pfRhoCentralNeutralHandle;
         rhoCentralChargedPileUp = *pfRhoCentralChargedPileUpHandle;
+
+	JME::JetParameters parameters = {{JME::Binning::JetPt, j.pt()}, {JME::Binning::JetEta, j.eta()}, {JME::Binning::Rho, rhoAll}};
+	jetSF = resolution.getScaleFactor(parameters);
 
         // Loop over the PF candidates contained inside the jet, first sorting them in pT order
         std::vector<reco::CandidatePtr> pfCands = j.daughterPtrVector();
